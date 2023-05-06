@@ -32,11 +32,17 @@ begin
 
     process (addr) is
         variable rom_array : memory := (
-        X"93", X"82", X"42", X"06", X"13", X"03", X"52", X"00",
-        X"13", X"05", X"90", X"00", X"13", X"00", X"00", X"00",
-        X"33", X"04", X"53", X"02", X"B3", X"84", X"A2", X"02",
-        X"93", X"03", X"42", X"06", X"13", X"03", X"B3", X"00", 
-        X"93", X"04", X"A3", X"00",
+        X"93", X"82", X"42", X"06",
+        X"13", X"03", X"52", X"00",
+        X"13", X"05", X"90", X"00",
+        X"13", X"00", X"00", X"00",
+        X"33", X"c4", X"62", X"02",
+        X"b3", X"c4", X"a2", X"02",
+        X"b3", X"05", X"53", X"02",
+        X"33", X"06", X"55", X"02",
+        X"93", X"03", X"42", X"06",
+        X"13", X"03", X"b3", X"00",
+        X"93", X"04", X"a3", X"00",
         others => (others=>'0'));
         variable word_addr : std_logic_vector (ADDRLEN-1 downto 0) := (others=>'0');
     begin

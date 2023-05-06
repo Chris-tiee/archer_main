@@ -22,7 +22,7 @@ entity control is
   port (
     instruction : in std_logic_vector (XLEN-1 downto 0);
     BranchCond : in std_logic; -- BR. COND. SATISFIED = 1; NOT SATISFIED = 0
-    MStall : in std_logic; -- stalling to simulate 5cc 
+    MStall : in std_logic_vector(1 downto 0); -- stalling to simulate 5cc 
     MNop : in std_logic;
     Jump : out std_logic;
     Lui : out std_logic;
@@ -156,8 +156,10 @@ begin
         null;
     end case;
 
-    if (MStall='1' and (opcode/= OPCODE_RTYPE or funct7(0)/='1'))  then 
+    if (MStall="10" and (opcode/= OPCODE_RTYPE or funct7(0)/='1' or funct3(2)/='0'))  then 
       Stall<='1';
+    elsif (MStall ="11") then
+      Stall <='1';
     end if;
 
     if MNop='1' then
