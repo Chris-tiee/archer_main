@@ -79,7 +79,7 @@ architecture rtl of archer_rv32i_pipelined is
         port (
             instruction : in std_logic_vector (XLEN-1 downto 0);
             BranchCond : in std_logic; -- BR. COND. SATISFIED = 1; NOT SATISFIED = 0
-            MStall : in std_logic; -- stalling to simulate 5cc 
+            MStall : in std_logic_vector(1 downto 0); -- stalling to simulate 5cc 
             MNop : in std_logic;
             Jump : out std_logic;
             Lui : out std_logic;
@@ -159,7 +159,7 @@ architecture rtl of archer_rv32i_pipelined is
             instruction_in : in std_logic_vector (XLEN-1 downto 0);
             instruction_out : out std_logic_vector (XLEN-1 downto 0);
             result : out std_logic_vector (XLEN-1 downto 0);
-            MStall : out std_logic;
+            MStall : out std_logic_vector(1 downto 0);
             MNop : out std_logic
         );
     end component;
@@ -354,7 +354,7 @@ architecture rtl of archer_rv32i_pipelined is
     signal d_alu_main_result : std_logic_vector (XLEN-1 downto 0);
     signal d_multALU_result_EX : std_logic_vector (XLEN-1 downto 0);
 
-    signal c_mstall_EX : std_logic;
+    signal c_mstall_EX : std_logic_vector(1 downto 0);
     signal c_mnop_EX : std_logic;
 
     signal c_jump_EX : std_logic;

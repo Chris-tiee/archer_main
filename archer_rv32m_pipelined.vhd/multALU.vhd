@@ -13,7 +13,7 @@ entity multALU is
         instruction_in : in std_logic_vector (XLEN-1 downto 0);
         instruction_out : out std_logic_vector (XLEN-1 downto 0);
         result : out std_logic_vector (XLEN-1 downto 0);
-        MStall : out std_logic;
+        MStall : out std_logic_vector(1 downto 0);
         MNop : out std_logic
     );
 end multALU;
@@ -126,10 +126,12 @@ begin
                 (others=>'0') when others;
 
     instruction_out <= instruction_EX5;
-    MStall <=   '0' when (MExt_EX1='1' and MExt_EX2='1' and MExt_EX3='1' and MExt_EX4='1' and MExt_EX5='1' and instruction_EX4=instruction_EX5) else
-                '1' when (MExt_EX1='1') else
-                '0' ;
+    MStall <=   "00" when (MExt_EX1='1' and MExt_EX2='1' and MExt_EX3='1' and MExt_EX4='1' and MExt_EX5='1' and instruction_EX1=instruction_EX5) else
+                "11" when (MExt_EX1 ='1'and instruction_EX1(14)='1') else
+                "10" when (MExt_EX1='1') else
+                "00" ;
     MNop <=     '1' when MExt_EX1='1' and MExt_EX5/='1' else
+                '1' when MExt_EX1='1' and MExt_EX5='1' and instruction_EX1/=instruction_EX5 and instruction_EX5(14)='1' else
                 '0' when MExt_EX5='1';
 
 end architecture;
