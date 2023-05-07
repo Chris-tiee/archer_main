@@ -14,6 +14,8 @@ entity ex_mem is
         sign_ext_n : out std_logic;
         pcplus4_in: in std_logic_vector (XLEN-1 downto 0);
         pcplus4_out : out std_logic_vector (XLEN-1 downto 0);
+        rd_in : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+        rd_out : out std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
 
         Nop : in std_logic;
 
@@ -43,13 +45,14 @@ begin
     process(clk, rst_n)
     begin
     if rising_edge(clk) then 
-        if (Nop='1') then 
+        if (Nop='1' or rst_n='0') then 
             instruction_out <= (others=>'0');
             byte_mask <= (others=>'0');
             sign_ext_n <= '0';
             alu_out <= (others=>'0');
             regB_out <= (others=>'0');
             pcplus4_out <= (others=>'0');
+            rd_out  <= (others=>'0');
 
             Jump_out <= '0';
             RegWrite_out <= '0';
@@ -64,6 +67,7 @@ begin
             alu_out <= alu_in;
             regB_out <= regB_in;
             pcplus4_out <= pcplus4_in;
+            rd_out <=rd_in;
 
             Jump_out <= Jump_in;
             RegWrite_out <= RegWrite_in;

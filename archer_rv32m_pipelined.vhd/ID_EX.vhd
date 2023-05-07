@@ -10,18 +10,26 @@ entity id_ex is
 
         instruction_in : in std_logic_vector (XLEN-1 downto 0);
         instruction_out : out std_logic_vector (XLEN-1 downto 0);
+        rd_out : out std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+
+        rs1_in : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+        rs1_out : out std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+        rs2_in : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+        rs2_out : out std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+        
         regA_in : in std_logic_vector (XLEN-1 downto 0);
         regB_in : in std_logic_vector (XLEN-1 downto 0);
         regA_out : out std_logic_vector (XLEN-1 downto 0);
         regB_out : out std_logic_vector (XLEN-1 downto 0);
         immediate_in : in std_logic_vector (XLEN-1 downto 0);
         immediate_out : out std_logic_vector (XLEN-1 downto 0);
+        
         pcplus4_in: in std_logic_vector (XLEN-1 downto 0);
         pcplus4_out : out std_logic_vector (XLEN-1 downto 0);
         pc_in : in std_logic_vector (XLEN-1 downto 0);
         pc_out : out std_logic_vector (XLEN-1 downto 0);
+        
         Stall : in std_logic;
-
        
         Jump_in : in std_logic;
         Lui_in : in std_logic;
@@ -57,9 +65,15 @@ begin
     begin
     if (rising_edge(clk) and Stall/='1') then   
         instruction_out <= instruction_in;
+        rd_out <=instruction_in (LOG2_XRF_SIZE+6 downto 7);
+
+        rs1_out <= rs1_in;
+        rs2_out <= rs2_in;
+
         regA_out <= regA_in;
         regB_out <= regB_in;
         immediate_out <= immediate_in;
+        
         pcplus4_out <= pcplus4_in;
         pc_out <= pc_in;
 

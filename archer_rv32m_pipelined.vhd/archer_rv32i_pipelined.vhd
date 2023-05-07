@@ -57,6 +57,25 @@ architecture rtl of archer_rv32i_pipelined is
         );
     end component;
 
+    component mux2to1_5b
+        port (
+            sel : in std_logic;
+            input0 : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            input1 : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            output : out std_logic_vector (LOG2_XRF_SIZE-1 downto 0)
+        );
+    end component;
+
+    component mux3to1
+        port (  
+            sel : in std_logic_vector(1 downto 0);
+            input00 : in std_logic_vector (XLEN-1 downto 0);
+            input01 : in std_logic_vector (XLEN-1 downto 0);
+            input10 : in std_logic_vector (XLEN-1 downto 0);
+            output : out std_logic_vector (XLEN-1 downto 0)
+        );
+    end component;
+
     component pc
         port (
             clk : in std_logic;
@@ -81,6 +100,7 @@ architecture rtl of archer_rv32i_pipelined is
             BranchCond : in std_logic; -- BR. COND. SATISFIED = 1; NOT SATISFIED = 0
             MStall : in std_logic_vector(1 downto 0); -- stalling to simulate 5cc 
             MNop : in std_logic;
+            dfStall : in std_logic;
             Jump : out std_logic;
             Lui : out std_logic;
             PCSrc : out std_logic;
@@ -158,28 +178,48 @@ architecture rtl of archer_rv32i_pipelined is
             inputB: in std_logic_vector (XLEN-1 downto 0);
             instruction_in : in std_logic_vector (XLEN-1 downto 0);
             instruction_out : out std_logic_vector (XLEN-1 downto 0);
+            rd_in : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            rd_out : out std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
             result : out std_logic_vector (XLEN-1 downto 0);
             MStall : out std_logic_vector(1 downto 0);
             MNop : out std_logic
         );
     end component;
 
+    component dataForwarding
+        port (
+            clk : in std_logic;
+            rs1 : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            rs2 : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            rd_EX : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            rd_MEM: in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            MemToReg_MEM : in std_logic;
+            RegWrite_MEM : in std_logic;
+            Jump_MEM : in std_logic;
+            rd_WB: in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            RegWrite_WB : in std_logic;
+            regA : out  std_logic_vector (1 downto 0);
+            regB : out std_logic_vector (1 downto 0);
+            stall : out std_logic
+        );
+    end component;
+
     component if_id
-    port (
-        clk : in std_logic;
-        rst_n : in std_logic;
-        instruction_in : in std_logic_vector (XLEN-1 downto 0);
-        instruction_out : out std_logic_vector (XLEN-1 downto 0);
-        funct3: out std_logic_vector (2 downto 0);
-        rs1 : out std_logic_vector (4 downto 0);
-        rs2 : out std_logic_vector (4 downto 0);
-        pcplus4_in: in std_logic_vector (XLEN-1 downto 0);
-        pcplus4_out : out std_logic_vector (XLEN-1 downto 0);
-        pc_in : in std_logic_vector (XLEN-1 downto 0);
-        pc_out : out std_logic_vector (XLEN-1 downto 0);
-        PCSrc : in std_logic;   
-        Stall : in std_logic  
-    );
+        port (
+            clk : in std_logic;
+            rst_n : in std_logic;
+            instruction_in : in std_logic_vector (XLEN-1 downto 0);
+            instruction_out : out std_logic_vector (XLEN-1 downto 0);
+            funct3: out std_logic_vector (2 downto 0);
+            rs1 : out std_logic_vector (4 downto 0);
+            rs2 : out std_logic_vector (4 downto 0);
+            pcplus4_in: in std_logic_vector (XLEN-1 downto 0);
+            pcplus4_out : out std_logic_vector (XLEN-1 downto 0);
+            pc_in : in std_logic_vector (XLEN-1 downto 0);
+            pc_out : out std_logic_vector (XLEN-1 downto 0);
+            PCSrc : in std_logic;   
+            Stall : in std_logic  
+        );
     end component;
 
     component id_ex is
@@ -189,6 +229,11 @@ architecture rtl of archer_rv32i_pipelined is
             
             instruction_in : in std_logic_vector (XLEN-1 downto 0);
             instruction_out : out std_logic_vector (XLEN-1 downto 0);
+            rd_out : out std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            rs1_in : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            rs1_out : out std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            rs2_in : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            rs2_out : out std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
             regA_in : in std_logic_vector (XLEN-1 downto 0);
             regB_in : in std_logic_vector (XLEN-1 downto 0);
             regA_out : out std_logic_vector (XLEN-1 downto 0);
@@ -240,6 +285,8 @@ architecture rtl of archer_rv32i_pipelined is
             sign_ext_n : out std_logic;
             pcplus4_in: in std_logic_vector (XLEN-1 downto 0);
             pcplus4_out : out std_logic_vector (XLEN-1 downto 0);
+            rd_in : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            rd_out : out std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
 
             Nop : in std_logic;
 
@@ -279,8 +326,9 @@ architecture rtl of archer_rv32i_pipelined is
             mem_in: in std_logic_vector (XLEN-1 downto 0);
             mem_out: out std_logic_vector (XLEN-1 downto 0);
 
-            rd_out: out std_logic_vector (4 downto 0);
-        
+            rd_in: in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            rd_out: out std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+
             Jump_in : in std_logic;
             RegWrite_in : in std_logic;
             MemToReg_in : in std_logic;
@@ -306,8 +354,8 @@ architecture rtl of archer_rv32i_pipelined is
     signal d_instr_word_ID : std_logic_vector(XLEN-1 downto 0);
     signal d_funct3 : std_logic_vector (2 downto 0);
     
-    signal d_rs1 : std_logic_vector (4 downto 0);
-    signal d_rs2 : std_logic_vector (4 downto 0);
+    signal d_rs1_ID : std_logic_vector (4 downto 0);
+    signal d_rs2_ID : std_logic_vector (4 downto 0);
     signal d_regA_ID : std_logic_vector (XLEN-1 downto 0);
     signal d_regB_ID : std_logic_vector (XLEN-1 downto 0);
     signal d_immediate_ID : std_logic_vector (XLEN-1 downto 0);
@@ -337,6 +385,13 @@ architecture rtl of archer_rv32i_pipelined is
     signal d_instr_word_EX : std_logic_vector(XLEN-1 downto 0);
     signal d_instr_word_mult_EX : std_logic_vector(XLEN-1 downto 0);
     signal d_instr_word_final_EX : std_logic_vector(XLEN-1 downto 0);
+    signal d_rs1_EX : std_logic_vector (4 downto 0);
+    signal d_rs2_EX : std_logic_vector (4 downto 0);
+    signal d_rd_EX : std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+    signal d_rd_mult_EX : std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+    signal d_rd_final_EX : std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+    signal d_regA_rf_EX : std_logic_vector (XLEN-1 downto 0);
+    signal d_regB_rf_EX : std_logic_vector (XLEN-1 downto 0);    
     signal d_regA_EX : std_logic_vector (XLEN-1 downto 0);
     signal d_regB_EX : std_logic_vector (XLEN-1 downto 0);
     signal d_immediate_EX : std_logic_vector (XLEN-1 downto 0);
@@ -354,8 +409,13 @@ architecture rtl of archer_rv32i_pipelined is
     signal d_alu_main_result : std_logic_vector (XLEN-1 downto 0);
     signal d_multALU_result_EX : std_logic_vector (XLEN-1 downto 0);
 
+
+    signal c_regA_EX : std_logic_vector (1 downto 0);
+    signal c_regB_EX : std_logic_vector (1 downto 0);
+
     signal c_mstall_EX : std_logic_vector(1 downto 0);
     signal c_mnop_EX : std_logic;
+    signal c_stall_df_EX : std_logic;
 
     signal c_jump_EX : std_logic;
     signal c_lui_EX : std_logic;
@@ -374,6 +434,7 @@ architecture rtl of archer_rv32i_pipelined is
     signal d_instr_word_MEM : std_logic_vector(XLEN-1 downto 0);
     signal d_byte_mask : std_logic_vector (1 downto 0);
     signal d_sign_ext_n : std_logic;
+    signal d_rd_MEM : std_logic_vector(LOG2_XRF_SIZE-1 downto 0);
 
     signal d_alu_result_MEM : std_logic_vector (XLEN-1 downto 0);
     signal d_regB_MEM : std_logic_vector (XLEN-1 downto 0);
@@ -394,7 +455,7 @@ architecture rtl of archer_rv32i_pipelined is
     signal c_mem_to_reg_WB : std_logic;
     signal c_csrwen_WB : std_logic;
 
-    signal d_rd_WB : std_logic_vector(4 downto 0);
+    signal d_rd_WB : std_logic_vector(LOG2_XRF_SIZE-1 downto 0);
     signal d_instr_word_WB : std_logic_vector (XLEN-1 downto 0);
 
     signal d_pcplus4_WB : std_logic_vector(XLEN-1 downto 0);
@@ -421,11 +482,11 @@ begin
     pc2_mux : mux2to1 port map (sel => c_stall_ID, input0 => d_pc1_in, input1 => d_pc_out_IF, output => d_pc_in);
     
     IF_ID_reg : IF_ID port map (clk => clk, rst_n => rst_n, instruction_in => d_instr_word_IF, instruction_out => d_instr_word_ID, 
-                                funct3 => d_funct3, rs1 => d_rs1, rs2 => d_rs2, pcplus4_in => d_pcplus4_IF,pcplus4_out => d_pcplus4_ID,
+                                funct3 => d_funct3, rs1 => d_rs1_ID, rs2 => d_rs2_ID, pcplus4_in => d_pcplus4_IF,pcplus4_out => d_pcplus4_ID,
                                 pc_in => d_pc_out_IF, pc_out => d_pc_out_ID, PCSrc => c_PCSrc_ID, Stall => c_stall_ID );
 
     control_inst : control port map (instruction => d_instr_word_ID, BranchCond => c_branch_out, MStall => c_mstall_EX, MNop => c_mnop_EX,
-                                    Jump => c_jump_ID, Lui => c_lui_ID, PCSrc => c_PCSrc_ID, RegWrite => c_reg_write_ID,
+                                    dfStall=> c_stall_df_EX, Jump => c_jump_ID, Lui => c_lui_ID, PCSrc => c_PCSrc_ID, RegWrite => c_reg_write_ID,
                                     ALUSrc1 => c_alu_src1_ID, ALUSrc2 => c_alu_src2_ID, ALUOp => c_alu_op_ID, MemWrite => c_mem_write_ID,
                                     MemRead => c_mem_read_ID, MemToReg => c_mem_to_reg_ID, CSRWen => c_csrwen_ID, CSR => c_csr_ID, 
                                     Stall => c_stall_ID, Nop => c_nop_ID, MExt => c_mext_ID );
@@ -434,13 +495,14 @@ begin
 
     immgen_inst : immgen port map (instruction => d_instr_word_ID, immediate => d_immediate_ID);
 
-    RF_inst : regfile port map (clk => clk, rst_n => rst_n, RegWrite => c_reg_write_WB, rs1 => d_rs1, rs2 => d_rs2, 
+    RF_inst : regfile port map (clk => clk, rst_n => rst_n, RegWrite => c_reg_write_WB, rs1 => d_rs1_ID, rs2 => d_rs2_ID, 
                                 rd => d_rd_WB, datain => d_reg_file_datain_WB, regA => d_regA_ID, regB => d_regB_ID);
 
     branch_alu_inst : branch_alu port map (inputA => d_pc_out_ID, inputB => d_immediate_ID, result => d_branch_result); 
 
-    ID_EX_reg : id_ex port map (clk => clk, rst_n => rst_n, instruction_in => d_instr_word_ID, instruction_out => d_instr_word_EX, regA_in => d_regA_ID, 
-                                regB_in => d_regB_ID, regA_out => d_regA_EX, regB_out => d_regB_EX, immediate_in => d_immediate_ID, 
+    ID_EX_reg : id_ex port map (clk => clk, rst_n => rst_n, instruction_in => d_instr_word_ID, instruction_out => d_instr_word_EX, rd_out => d_rd_EX,
+                                rs1_in => d_rs1_ID, rs1_out => d_rs1_EX, rs2_in => d_rs2_ID, rs2_out => d_rs2_EX,
+                                regA_in => d_regA_ID, regB_in => d_regB_ID, regA_out => d_regA_rf_EX, regB_out => d_regB_rf_EX, immediate_in => d_immediate_ID, 
                                 immediate_out => d_immediate_EX, pcplus4_in => d_pcplus4_ID, pcplus4_out => d_pcplus4_EX, pc_in => d_pc_out_ID, 
                                 pc_out => d_pc_out_EX, Stall => c_stall_ID, Jump_in => c_jump_ID, Jump_out => c_jump_EX, Lui_in => c_lui_ID, Lui_out => c_lui_EX,
                                 RegWrite_in => c_reg_write_ID, RegWrite_out => c_reg_write_EX, ALUSrc1_in => c_alu_src1_ID, ALUSrc1_out => c_alu_src1_EX,
@@ -449,8 +511,11 @@ begin
                                 MemToReg_in => c_mem_to_reg_ID,MemToReg_out => c_mem_to_reg_EX, CSRWen_in => c_csrwen_ID, CSRWen_out => c_csrwen_EX,
                                 CSR_in => c_csr_ID , CSR_out => c_csr_EX, MExt_in => c_mext_ID, MExt_out => c_mext_EX);
 	
+    regA_mux : mux3to1 port map (sel => c_regA_EX, input00 => d_regA_rf_EX, input01 => d_alu_result_MEM, input10 => d_reg_file_datain_WB, output => d_regA_EX);
     lui_mux : mux2to1 port map (sel => c_lui_EX, input0 => d_pc_out_EX, input1 => d_zero, output => d_lui_mux_out);
     alu_src1_mux : mux2to1 port map (sel => c_alu_src1_EX, input0 => d_regA_EX, input1 => d_lui_mux_out, output => d_alu_src1);
+    
+    regB_mux : mux3to1 port map (sel => c_regB_EX, input00 => d_regB_rf_EX, input01 => d_alu_result_MEM, input10 => d_reg_file_datain_WB, output => d_regB_EX);
     alu_src2_mux : mux2to1 port map (sel => c_alu_src2_EX, input0 => d_regB_EX, input1 => d_immediate_EX, output => d_alu_src2);
     CSRMux: mux2to1 port map (sel=>c_csr_EX, input0=>d_alu_src2, input1=>d_csr_EX, output=>d_csrmux_out);
     
@@ -458,13 +523,18 @@ begin
     
     alu_inst : alu port map (inputA => d_alu_src1, inputB =>d_csrmux_out, ALUop => c_alu_op_EX, result => d_alu_main_result);
     multALU_inst: multALU port map (clk => clk, MExt => c_mext_EX, ALUOp => c_alu_op_EX, inputA=>d_alu_src1, inputB =>d_csrmux_out, instruction_in => d_instr_word_EX,
-                                    instruction_out => d_instr_word_mult_EX, result => d_multALU_result_EX, MStall => c_mstall_EX, MNop => c_mnop_EX);
+                                    instruction_out => d_instr_word_mult_EX, rd_in => d_rd_EX, rd_out => d_rd_mult_EX, result => d_multALU_result_EX, MStall => c_mstall_EX, MNop => c_mnop_EX);
     alu_mux : mux2to1 port map (sel => c_mext_EX, input0 => d_alu_main_result, input1 => d_multALU_result_EX, output => d_alu_result_EX);
     instr_mux : mux2to1 port map (sel => c_mext_EX, input0 => d_instr_word_EX, input1 => d_instr_word_mult_EX, output => d_instr_word_final_EX);
+    rd_mux : mux2to1_5b port map (sel => c_mext_EX, input0 => d_rd_EX, input1 => d_rd_mult_EX, output => d_rd_final_EX);
+
+    dataForwarding_inst : dataForwarding port map (clk => clk, rs1=> d_rs1_EX, rs2=>d_rs2_EX, rd_EX => d_rd_EX, rd_MEM => d_rd_MEM, MemToReg_MEM => c_mem_to_reg_MEM, Jump_MEM => c_jump_MEM,
+                                                    RegWrite_MEM => c_reg_write_MEM, rd_WB => d_rd_WB, RegWrite_WB => c_reg_write_WB, regA => c_regA_EX, regB => c_regB_EX,
+                                                    stall => c_stall_df_EX);
     
-    EX_MEM_reg : ex_mem port map (clk => clk, rst_n => rst_n, instruction_in => d_instr_word_final_EX, instruction_out => d_instr_word_MEM,
-                                    byte_mask => d_byte_mask, sign_ext_n => d_sign_ext_n, pcplus4_in => d_pcplus4_EX, pcplus4_out => d_pcplus4_MEM, Nop => c_nop_ID,
-                                    alu_in => d_alu_result_EX, alu_out => d_alu_result_MEM, regB_in => d_regB_EX, regB_out => d_regB_MEM,
+    EX_MEM_reg : ex_mem port map (clk => clk, rst_n => rst_n, instruction_in => d_instr_word_final_EX, instruction_out => d_instr_word_MEM, byte_mask => d_byte_mask,
+                                    sign_ext_n => d_sign_ext_n, pcplus4_in => d_pcplus4_EX, pcplus4_out => d_pcplus4_MEM, Nop => c_nop_ID, rd_in => d_rd_final_EX,
+                                    rd_out => d_rd_MEM, alu_in => d_alu_result_EX, alu_out => d_alu_result_MEM, regB_in => d_regB_EX, regB_out => d_regB_MEM,
                                     Jump_in => c_jump_EX, Jump_out => c_jump_MEM, RegWrite_in => c_reg_write_EX, RegWrite_out => c_reg_write_MEM,
                                     MemWrite_in => c_mem_write_EX, MemWrite_out => c_mem_write_MEM, MemRead_in => c_mem_read_EX, MemRead_out => c_mem_read_MEM,
                                     MemToReg_in => c_mem_to_reg_EX, MemToReg_out => c_mem_to_reg_MEM, CSRWen_in => c_csrwen_EX, CSRWen_out => c_csrwen_MEM);
@@ -477,7 +547,7 @@ begin
 
     MEM_WB_reg : mem_wb port map (clk => clk, rst_n => rst_n, instruction_in =>d_instr_word_MEM, instruction_out => d_instr_word_WB,
                                     pcplus4_in => d_pcplus4_MEM, pcplus4_out => d_pcplus4_WB, alu_in => d_alu_result_MEM, 
-                                    alu_out => d_alu_result_WB, mem_in => d_data_mem_out_MEM, mem_out => d_data_mem_out_WB, 
+                                    alu_out => d_alu_result_WB, mem_in => d_data_mem_out_MEM, mem_out => d_data_mem_out_WB, rd_in => d_rd_MEM,
                                     rd_out => d_rd_WB, Jump_in => c_jump_MEM, Jump_out => c_jump_WB, RegWrite_in => c_reg_write_MEM,
                                     RegWrite_out => c_reg_write_WB, MemToReg_in => c_mem_to_reg_MEM, MemToReg_out => c_mem_to_reg_WB,
                                     CSRWen_in => c_csrwen_MEM, CSRWen_out => c_csrwen_WB );

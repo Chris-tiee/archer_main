@@ -12,6 +12,8 @@ entity multALU is
         inputB: in std_logic_vector (XLEN-1 downto 0);
         instruction_in : in std_logic_vector (XLEN-1 downto 0);
         instruction_out : out std_logic_vector (XLEN-1 downto 0);
+        rd_in : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+        rd_out : out std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
         result : out std_logic_vector (XLEN-1 downto 0);
         MStall : out std_logic_vector(1 downto 0);
         MNop : out std_logic
@@ -28,11 +30,13 @@ architecture rtl of multALU is
             inputB_in : in std_logic_vector (XLEN-1 downto 0);
             ALUOp_in : in std_logic_vector (4 downto 0);
             instruction_in: in std_logic_vector (XLEN-1 downto 0);
+            rd_in : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
             MExt_out : out std_logic;
             inputA_out: out std_logic_vector (XLEN-1 downto 0);
             inputB_out: out std_logic_vector (XLEN-1 downto 0);
             ALUOp_out : out std_logic_vector (4 downto 0);
-            instruction_out: out std_logic_vector (XLEN-1 downto 0)
+            instruction_out: out std_logic_vector (XLEN-1 downto 0);
+            rd_out : out std_logic_vector (LOG2_XRF_SIZE-1 downto 0)
         );
     end component;
 
@@ -41,30 +45,35 @@ architecture rtl of multALU is
     signal inputB_EX1: std_logic_vector (XLEN-1 downto 0);
     signal ALUOp_EX1 : std_logic_vector (4 downto 0);
     signal instruction_EX1 : std_logic_vector (XLEN-1 downto 0);
+    signal rd_EX1 : std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
 
     signal MExt_EX2 : std_logic :='0';
     signal inputA_EX2 : std_logic_vector (XLEN-1 downto 0);
     signal inputB_EX2: std_logic_vector (XLEN-1 downto 0);
     signal ALUOp_EX2 : std_logic_vector (4 downto 0);
     signal instruction_EX2 : std_logic_vector (XLEN-1 downto 0);
+    signal rd_EX2 : std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
 
     signal MExt_EX3 : std_logic :='0';
     signal inputA_EX3 : std_logic_vector (XLEN-1 downto 0);
     signal inputB_EX3: std_logic_vector (XLEN-1 downto 0);
     signal ALUOp_EX3 : std_logic_vector (4 downto 0);
     signal instruction_EX3 : std_logic_vector (XLEN-1 downto 0);
+    signal rd_EX3 : std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
 
     signal MExt_EX4 : std_logic :='0';
     signal inputA_EX4 : std_logic_vector (XLEN-1 downto 0);
     signal inputB_EX4: std_logic_vector (XLEN-1 downto 0);
     signal ALUOp_EX4 : std_logic_vector (4 downto 0);
     signal instruction_EX4 : std_logic_vector (XLEN-1 downto 0);
+    signal rd_EX4 : std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
 
     signal MExt_EX5: std_logic :='0';
     signal inputA_EX5 : std_logic_vector (XLEN-1 downto 0);
     signal inputB_EX5: std_logic_vector (XLEN-1 downto 0);
     signal ALUOp_EX5 : std_logic_vector (4 downto 0);
     signal instruction_EX5 : std_logic_vector (XLEN-1 downto 0);
+    signal rd_EX5 : std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
 
     --Multiply 
         signal mul_result: std_logic_vector (XLEN-1 downto 0);
@@ -88,11 +97,12 @@ begin
     inputB_EX1 <= inputB;
     ALUOp_EX1 <= ALUop;
     instruction_EX1 <= instruction_in;
+    rd_EX1 <= rd_in;
 
-    bus1 : multALUbus port map(clk=>clk, MExt_in=>MExt_EX1, inputA_in=>inputA_EX1, inputB_in=>inputB_EX1, ALUOp_in=>ALUOp_EX1,instruction_in =>instruction_EX1, MExt_out=>MExt_EX2, inputA_out=>inputA_EX2, inputB_out=>inputB_EX2,ALUOp_out=>ALUOp_EX2, instruction_out => instruction_EX2);
-    bus2 : multALUbus port map(clk=>clk, MExt_in=>MExt_EX2, inputA_in=>inputA_EX2, inputB_in=>inputB_EX2, ALUOp_in=>ALUOp_EX2,instruction_in =>instruction_EX2, MExt_out=>MExt_EX3, inputA_out=>inputA_EX3, inputB_out=>inputB_EX3,ALUOp_out=>ALUOp_EX3, instruction_out => instruction_EX3);
-    bus3 : multALUbus port map(clk=>clk, MExt_in=>MExt_EX3, inputA_in=>inputA_EX3, inputB_in=>inputB_EX3, ALUOp_in=>ALUOp_EX3,instruction_in =>instruction_EX3, MExt_out=>MExt_EX4, inputA_out=>inputA_EX4, inputB_out=>inputB_EX4,ALUOp_out=>ALUOp_EX4, instruction_out => instruction_EX4);
-    bus4 : multALUbus port map(clk=>clk, MExt_in=>MExt_EX4, inputA_in=>inputA_EX4, inputB_in=>inputB_EX4, ALUOp_in=>ALUOp_EX4,instruction_in =>instruction_EX4, MExt_out=>MExt_EX5, inputA_out=>inputA_EX5, inputB_out=>inputB_EX5,ALUOp_out=>ALUOp_EX5, instruction_out => instruction_EX5);
+    bus1 : multALUbus port map(clk=>clk, MExt_in=>MExt_EX1, inputA_in=>inputA_EX1, inputB_in=>inputB_EX1, ALUOp_in=>ALUOp_EX1,instruction_in =>instruction_EX1, rd_in => rd_EX1, MExt_out=>MExt_EX2, inputA_out=>inputA_EX2, inputB_out=>inputB_EX2,ALUOp_out=>ALUOp_EX2, instruction_out => instruction_EX2, rd_out => rd_EX2);
+    bus2 : multALUbus port map(clk=>clk, MExt_in=>MExt_EX2, inputA_in=>inputA_EX2, inputB_in=>inputB_EX2, ALUOp_in=>ALUOp_EX2,instruction_in =>instruction_EX2, rd_in => rd_EX2, MExt_out=>MExt_EX3, inputA_out=>inputA_EX3, inputB_out=>inputB_EX3,ALUOp_out=>ALUOp_EX3, instruction_out => instruction_EX3, rd_out => rd_EX3);
+    bus3 : multALUbus port map(clk=>clk, MExt_in=>MExt_EX3, inputA_in=>inputA_EX3, inputB_in=>inputB_EX3, ALUOp_in=>ALUOp_EX3,instruction_in =>instruction_EX3, rd_in => rd_EX3, MExt_out=>MExt_EX4, inputA_out=>inputA_EX4, inputB_out=>inputB_EX4,ALUOp_out=>ALUOp_EX4, instruction_out => instruction_EX4, rd_out => rd_EX4);
+    bus4 : multALUbus port map(clk=>clk, MExt_in=>MExt_EX4, inputA_in=>inputA_EX4, inputB_in=>inputB_EX4, ALUOp_in=>ALUOp_EX4,instruction_in =>instruction_EX4, rd_in => rd_EX4, MExt_out=>MExt_EX5, inputA_out=>inputA_EX5, inputB_out=>inputB_EX5,ALUOp_out=>ALUOp_EX5, instruction_out => instruction_EX5, rd_out => rd_EX5);
 
     --Multiply
     temp_mul <= std_logic_vector(signed(inputA_EX5) * signed(inputB_EX5));
@@ -126,6 +136,7 @@ begin
                 (others=>'0') when others;
 
     instruction_out <= instruction_EX5;
+    rd_out <= rd_EX5;
     MStall <=   "00" when (MExt_EX1='1' and MExt_EX2='1' and MExt_EX3='1' and MExt_EX4='1' and MExt_EX5='1' and instruction_EX1=instruction_EX5) else
                 "11" when (MExt_EX1 ='1'and instruction_EX1(14)='1') else
                 "10" when (MExt_EX1='1') else
