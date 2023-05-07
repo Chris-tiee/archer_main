@@ -24,6 +24,7 @@ entity control is
     BranchCond : in std_logic; -- BR. COND. SATISFIED = 1; NOT SATISFIED = 0
     MStall : in std_logic_vector(1 downto 0); -- stalling to simulate 5cc 
     MNop : in std_logic;
+    dfStall : in std_logic;
     Jump : out std_logic;
     Lui : out std_logic;
     PCSrc : out std_logic;
@@ -64,7 +65,7 @@ begin
 
   Jump <= jump_instr;
 
-  process (opcode, funct3, funct7, MStall, MNop) is
+  process (opcode, funct3, funct7, MStall, MNop, dfStall) is
   begin
 
     Lui <= '0';
@@ -160,9 +161,11 @@ begin
       Stall<='1';
     elsif (MStall ="11") then
       Stall <='1';
+    elsif (dfStall='1') then
+      Stall<='1';
     end if;
 
-    if MNop='1' then
+    if (MNop='1' or dfStall='1') then
       Nop <='1';
     end if;
 

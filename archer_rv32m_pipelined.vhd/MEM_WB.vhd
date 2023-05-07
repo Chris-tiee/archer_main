@@ -18,7 +18,8 @@ entity mem_wb is
         mem_in: in std_logic_vector (XLEN-1 downto 0);
         mem_out: out std_logic_vector (XLEN-1 downto 0);
 
-        rd_out: out std_logic_vector (4 downto 0);
+        rd_in: in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+        rd_out: out std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
        
         Jump_in : in std_logic;
         RegWrite_in : in std_logic;
@@ -40,11 +41,10 @@ begin
 
         instruction_out <= instruction_in;   
         pcplus4_out <= pcplus4_in;
+        rd_out <=rd_in;
 
         alu_out <= alu_in;
         mem_out <= mem_in;
-
-        rd_out <=instruction_in (LOG2_XRF_SIZE+6 downto 7);
         
         Jump_out <= Jump_in;
         RegWrite_out <= RegWrite_in;
