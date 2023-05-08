@@ -1,81 +1,81 @@
 v 4
-file . "multALU.vhd" "8d716ef42cf2a105d8126163b3b1241b3b34a72c" "20230508195021.576":
-  entity multalu at 1( 0) + 0 on 6171;
-  architecture rtl of multalu at 28( 1039) + 0 on 6172;
-file . "multALUbus.vhd" "06e58061db60e64688b9990c9174b55b6df10c53" "20230508195021.577":
-  entity multalubus at 1( 0) + 0 on 6173;
-  architecture rtl of multalubus at 25( 900) + 0 on 6174;
-file . "M_counter.vhd" "ba53aba0ded54e9f11e3f4a29edb26d3904abce0" "20230426181653.544":
-  entity m_counter at 1( 0) + 0 on 1575;
-  architecture rtl of m_counter at 14( 249) + 0 on 1576;
-file . "ID_EX.vhd" "16af2669b875a05f0bf39e5be0fec1f5169d4871" "20230508195021.567":
-  entity id_ex at 1( 0) + 0 on 6159;
-  architecture rtl of id_ex at 63( 2381) + 0 on 6160;
-file . "regfile.vhd" "5006aa920fdf75fa950197a4b38b4f06148f655a" "20230508195021.560":
-  entity regfile at 16( 573) + 0 on 6147;
-  architecture rtl of regfile at 35( 1178) + 0 on 6148;
-file . "immgen.vhd" "fef6c859774c13712afa30e7a1874d8ae06cf170" "20230508195021.556":
-  entity immgen at 16( 549) + 0 on 6139;
-  architecture rtl of immgen at 28( 824) + 0 on 6140;
-file . "control.vhd" "38380a6173e4f9db6c782d2a2c99b5d61def74cc" "20230508195021.554":
-  entity control at 16( 547) + 0 on 6137;
-  architecture arch of control at 51( 1616) + 0 on 6138;
-file . "branch_cmp.vhd" "c91c73b71bd566715004a874d330c64b00189ce2" "20230508195021.552":
-  entity branch_cmp at 16( 547) + 0 on 6135;
-  architecture rtl of branch_cmp at 30( 901) + 0 on 6136;
-file . "alu.vhd" "1560200d935eee712733d58e3753cdd7e8acc95f" "20230508195021.551":
-  entity alu at 16( 561) + 0 on 6133;
-  architecture rtl of alu at 30( 930) + 0 on 6134;
-file . "archer_rv32i_pipelined_tb.vhd" "da43042ca88212547490538aede0cf59688c6f6d" "20230508195021.582":
-  entity archer_rv32i_pipelined_tb at 1( 0) + 0 on 6177;
-  architecture arch of archer_rv32i_pipelined_tb at 9( 176) + 0 on 6178;
-file . "IF_ID.vhd" "8a5a79834e0ecd7c0927dbf6b3dcdf1b9862b363" "20230508195021.566":
-  entity if_id at 1( 0) + 0 on 6157;
-  architecture rtl of if_id at 24( 793) + 0 on 6158;
-file . "rom.vhd" "23bfd8a55573f0e1b30435e8ef5d2513ee5109a6" "20230508195021.561":
-  entity rom at 16( 574) + 0 on 6149;
-  architecture rtl of rom at 28( 837) + 0 on 6150;
-file . "pc.vhd" "5d7a07a8b477603d267b91457f98b7f5ab285592" "20230508195021.559":
-  entity pc at 16( 559) + 0 on 6145;
-  architecture rtl of pc at 30( 877) + 0 on 6146;
-file . "mux2to1.vhd" "49055553df285aa6423bfc471fd142be71b1c0ed" "20230508195021.558":
-  entity mux2to1 at 16( 557) + 0 on 6143;
-  architecture rtl of mux2to1 at 30( 912) + 0 on 6144;
-file . "lmb.vhd" "3b4d1bc9fc7f02fde4069abcb4c369f317f9f600" "20230508195021.557":
-  entity lmb at 17( 560) + 0 on 6141;
-  architecture rtl of lmb at 39( 1447) + 0 on 6142;
-file . "add4.vhd" "f01fe653e2474fbcec0cb767067ae24c2e44b647" "20230508195021.549":
-  entity add4 at 16( 538) + 0 on 6131;
-  architecture rtl of add4 at 28( 801) + 0 on 6132;
-file . "archer_pkg.vhd" "66efa7b1e72b42b85afab6a2230f166966486a2c" "20230425205832.452":
-  package archer_pkg at 16( 544) + 0 on 174;
-file . "archer_rv32i_pipelined.vhd" "229582bc56ab8f6ff6c86af1f4079674791b5150" "20230508195021.581":
-  entity archer_rv32i_pipelined at 1( 0) + 0 on 6175;
-  architecture rtl of archer_rv32i_pipelined at 25( 991) + 0 on 6176;
-file . "branch_addr_alu.vhd" "4decb75ace664e93a26224ec25ca2b6c7c10e5c7" "20230508195021.565":
-  entity branch_alu at 1( 0) + 0 on 6155;
-  architecture rtl of branch_alu at 14( 332) + 0 on 6156;
-file . "CSRfile.vhd" "14e8f94af2548b703b28bbea6e05baebd3a169f0" "20230508195021.564":
-  entity csrfile at 1( 0) + 0 on 6153;
-  architecture rtl of csrfile at 18( 482) + 0 on 6154;
-file . "sram.vhd" "c94a501ad94ba212f0c2e8bb0ee8b56cfe2c787f" "20230508195021.562":
-  entity sram at 17( 559) + 0 on 6151;
-  architecture rtl of sram at 33( 988) + 0 on 6152;
-file . "EX_MEM.vhd" "d05ff5a872bef46376d9c6c987f15a417189f071" "20230508195021.568":
-  entity ex_mem at 1( 0) + 0 on 6161;
-  architecture rtl of ex_mem at 43( 1415) + 0 on 6162;
-file . "MEM_WB.vhd" "71f6a296db0cb74912522b2179bd55186f9617b9" "20230508195021.569":
-  entity mem_wb at 1( 0) + 0 on 6163;
-  architecture rtl of mem_wb at 36( 1137) + 0 on 6164;
-file . "dataForwarding.vhd" "7fe1fcb3d60c86fd2615e6267e5b6ccf185925c8" "20230508195021.570":
-  entity dataforwarding at 1( 0) + 0 on 6165;
-  architecture rtl of dataforwarding at 36( 1487) + 0 on 6166;
-file . "mux3to1.vhd" "f9f0f66c2716a9efaa8b117b8b282b51168fdc42" "20230508195021.572":
-  entity mux3to1 at 3( 34) + 0 on 6167;
-  architecture rtl of mux3to1 at 18( 468) + 0 on 6168;
-file . "mux2to1_5b.vhd" "0961422fac57c3458452fe7a5163823449b49d7f" "20230508195021.573":
-  entity mux2to1_5b at 1( 0) + 0 on 6169;
-  architecture rtl of mux2to1_5b at 15( 388) + 0 on 6170;
 file . "multDataFwd.vhd" "2603f0c04ec53330257838aeacd01735d2d441be" "20230507204834.322":
   entity multdatafwd at 1( 0) + 0 on 4681;
   architecture rtl of multdatafwd at 24( 762) + 0 on 4682;
+file . "mux2to1_5b.vhd" "0961422fac57c3458452fe7a5163823449b49d7f" "20230508204917.369":
+  entity mux2to1_5b at 1( 0) + 0 on 6409;
+  architecture rtl of mux2to1_5b at 15( 388) + 0 on 6410;
+file . "mux3to1.vhd" "f9f0f66c2716a9efaa8b117b8b282b51168fdc42" "20230508204917.368":
+  entity mux3to1 at 3( 34) + 0 on 6407;
+  architecture rtl of mux3to1 at 18( 468) + 0 on 6408;
+file . "dataForwarding.vhd" "e4ccb5b90d35a6836b02b3c7f2efe14e008c39fa" "20230508204917.367":
+  entity dataforwarding at 1( 0) + 0 on 6405;
+  architecture rtl of dataforwarding at 36( 1487) + 0 on 6406;
+file . "MEM_WB.vhd" "71f6a296db0cb74912522b2179bd55186f9617b9" "20230508204917.365":
+  entity mem_wb at 1( 0) + 0 on 6403;
+  architecture rtl of mem_wb at 36( 1137) + 0 on 6404;
+file . "EX_MEM.vhd" "d05ff5a872bef46376d9c6c987f15a417189f071" "20230508204917.365":
+  entity ex_mem at 1( 0) + 0 on 6401;
+  architecture rtl of ex_mem at 43( 1415) + 0 on 6402;
+file . "sram.vhd" "c94a501ad94ba212f0c2e8bb0ee8b56cfe2c787f" "20230508204917.360":
+  entity sram at 17( 559) + 0 on 6391;
+  architecture rtl of sram at 33( 988) + 0 on 6392;
+file . "CSRfile.vhd" "14e8f94af2548b703b28bbea6e05baebd3a169f0" "20230508204917.361":
+  entity csrfile at 1( 0) + 0 on 6393;
+  architecture rtl of csrfile at 18( 482) + 0 on 6394;
+file . "branch_addr_alu.vhd" "4decb75ace664e93a26224ec25ca2b6c7c10e5c7" "20230508204917.362":
+  entity branch_alu at 1( 0) + 0 on 6395;
+  architecture rtl of branch_alu at 14( 332) + 0 on 6396;
+file . "archer_rv32i_pipelined.vhd" "20a4a7a89fd2e7e187c2175899ebec71c11b6774" "20230508204917.376":
+  entity archer_rv32i_pipelined at 1( 0) + 0 on 6415;
+  architecture rtl of archer_rv32i_pipelined at 25( 991) + 0 on 6416;
+file . "archer_pkg.vhd" "66efa7b1e72b42b85afab6a2230f166966486a2c" "20230425205832.452":
+  package archer_pkg at 16( 544) + 0 on 174;
+file . "add4.vhd" "f01fe653e2474fbcec0cb767067ae24c2e44b647" "20230508204917.350":
+  entity add4 at 16( 538) + 0 on 6371;
+  architecture rtl of add4 at 28( 801) + 0 on 6372;
+file . "lmb.vhd" "3b4d1bc9fc7f02fde4069abcb4c369f317f9f600" "20230508204917.356":
+  entity lmb at 17( 560) + 0 on 6381;
+  architecture rtl of lmb at 39( 1447) + 0 on 6382;
+file . "mux2to1.vhd" "49055553df285aa6423bfc471fd142be71b1c0ed" "20230508204917.356":
+  entity mux2to1 at 16( 557) + 0 on 6383;
+  architecture rtl of mux2to1 at 30( 912) + 0 on 6384;
+file . "pc.vhd" "5d7a07a8b477603d267b91457f98b7f5ab285592" "20230508204917.357":
+  entity pc at 16( 559) + 0 on 6385;
+  architecture rtl of pc at 30( 877) + 0 on 6386;
+file . "rom.vhd" "f79795a3e7d7c94a4b05d26617f28b54a1bca329" "20230508204917.359":
+  entity rom at 16( 574) + 0 on 6389;
+  architecture rtl of rom at 28( 837) + 0 on 6390;
+file . "IF_ID.vhd" "8a5a79834e0ecd7c0927dbf6b3dcdf1b9862b363" "20230508204917.362":
+  entity if_id at 1( 0) + 0 on 6397;
+  architecture rtl of if_id at 24( 793) + 0 on 6398;
+file . "archer_rv32i_pipelined_tb.vhd" "da43042ca88212547490538aede0cf59688c6f6d" "20230508204917.377":
+  entity archer_rv32i_pipelined_tb at 1( 0) + 0 on 6417;
+  architecture arch of archer_rv32i_pipelined_tb at 9( 176) + 0 on 6418;
+file . "alu.vhd" "1560200d935eee712733d58e3753cdd7e8acc95f" "20230508204917.352":
+  entity alu at 16( 561) + 0 on 6373;
+  architecture rtl of alu at 30( 930) + 0 on 6374;
+file . "branch_cmp.vhd" "c91c73b71bd566715004a874d330c64b00189ce2" "20230508204917.353":
+  entity branch_cmp at 16( 547) + 0 on 6375;
+  architecture rtl of branch_cmp at 30( 901) + 0 on 6376;
+file . "control.vhd" "38380a6173e4f9db6c782d2a2c99b5d61def74cc" "20230508204917.354":
+  entity control at 16( 547) + 0 on 6377;
+  architecture arch of control at 51( 1616) + 0 on 6378;
+file . "immgen.vhd" "fef6c859774c13712afa30e7a1874d8ae06cf170" "20230508204917.355":
+  entity immgen at 16( 549) + 0 on 6379;
+  architecture rtl of immgen at 28( 824) + 0 on 6380;
+file . "regfile.vhd" "5006aa920fdf75fa950197a4b38b4f06148f655a" "20230508204917.358":
+  entity regfile at 16( 573) + 0 on 6387;
+  architecture rtl of regfile at 35( 1178) + 0 on 6388;
+file . "ID_EX.vhd" "16af2669b875a05f0bf39e5be0fec1f5169d4871" "20230508204917.364":
+  entity id_ex at 1( 0) + 0 on 6399;
+  architecture rtl of id_ex at 63( 2381) + 0 on 6400;
+file . "M_counter.vhd" "ba53aba0ded54e9f11e3f4a29edb26d3904abce0" "20230426181653.544":
+  entity m_counter at 1( 0) + 0 on 1575;
+  architecture rtl of m_counter at 14( 249) + 0 on 1576;
+file . "multALUbus.vhd" "06e58061db60e64688b9990c9174b55b6df10c53" "20230508204917.373":
+  entity multalubus at 1( 0) + 0 on 6413;
+  architecture rtl of multalubus at 25( 900) + 0 on 6414;
+file . "multALU.vhd" "8d716ef42cf2a105d8126163b3b1241b3b34a72c" "20230508204917.372":
+  entity multalu at 1( 0) + 0 on 6411;
+  architecture rtl of multalu at 28( 1039) + 0 on 6412;

@@ -384,6 +384,7 @@ architecture rtl of archer_rv32i_pipelined is
     signal d_regA_b_ID : std_logic_vector (XLEN-1 downto 0);
     signal d_regB_b_ID : std_logic_vector (XLEN-1 downto 0);
     signal d_immediate_ID : std_logic_vector (XLEN-1 downto 0);
+    signal d_inputA_ID : std_logic_vector (XLEN-1 downto 0);
 
     signal d_pcplus4_ID : std_logic_vector(XLEN-1 downto 0);
     signal d_pc_out_ID: std_logic_vector(XLEN-1 downto 0);
@@ -535,8 +536,9 @@ begin
 
     RF_inst : regfile port map (clk => clk, rst_n => rst_n, RegWrite => c_reg_write_WB, rs1 => d_rs1_ID, rs2 => d_rs2_ID, 
                                 rd => d_rd_WB, datain => d_reg_file_datain_WB, regA => d_regA_ID, regB => d_regB_ID);
-
-    branch_alu_inst : branch_alu port map (inputA => d_pc_out_ID, inputB => d_immediate_ID, result => d_branch_result); 
+    
+    branch_mux : mux2to1 port map (sel => c_alu_src1_ID, input0 =>d_regA_b_ID , input1 => d_pc_out_ID , output => d_inputA_ID);
+    branch_alu_inst : branch_alu port map (inputA => d_inputA_ID, inputB => d_immediate_ID, result => d_branch_result); 
 
     ID_EX_reg : id_ex port map (clk => clk, rst_n => rst_n, instruction_in => d_instr_word_ID, instruction_out => d_instr_word_EX, rd_out => d_rd_EX,
                                 rs1_in => d_rs1_ID, rs1_out => d_rs1_EX, rs2_in => d_rs2_ID, rs2_out => d_rs2_EX,

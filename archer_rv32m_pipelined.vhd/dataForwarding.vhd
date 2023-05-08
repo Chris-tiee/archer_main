@@ -121,7 +121,7 @@ begin
         end if;
 
         -- branch dataForwarding
-        if opcode_br = OPCODE_BRANCH then
+        if opcode_br = OPCODE_BRANCH or opcode_br = OPCODE_JALR or opcode = OPCODE_JAL then
              -- condition when not load and depends on instr in MEM
             if (rs1_ID = rd_MEM and MemToReg_MEM/='1' and Jump_MEM/='1' and RegWrite_MEM='1') then
                 regA_branch<= "01";
