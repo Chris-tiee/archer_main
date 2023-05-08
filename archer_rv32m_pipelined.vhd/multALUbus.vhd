@@ -12,6 +12,7 @@ entity multALUbus is
         ALUOp_in : in std_logic_vector (4 downto 0);
         instruction_in: in std_logic_vector (XLEN-1 downto 0);
         rd_in : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+        stall : in std_logic;
         MExt_out : out std_logic;
         inputA_out: out std_logic_vector (XLEN-1 downto 0);
         inputB_out: out std_logic_vector (XLEN-1 downto 0);
@@ -25,7 +26,7 @@ architecture rtl of multALUbus is
 begin
     process(clk, MExt_in)
     begin
-        if rising_edge(clk) then
+        if rising_edge(clk) and stall/='1' then
             MExt_out <= MExt_in;
             inputA_out <= inputA_in;
             inputB_out <= inputB_in;
