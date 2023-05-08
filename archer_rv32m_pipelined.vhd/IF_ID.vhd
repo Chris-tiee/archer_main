@@ -25,8 +25,14 @@ architecture rtl of if_id is
 begin
     process(clk, rst_n)
     begin
-
-    if (rising_edge(clk) and Stall/='1') then  
+    if (rst_n='0') then 
+        instruction_out <= (others=>'0');
+        funct3 <=  (others=>'0');
+        rs1 <=  (others=>'0');
+        rs2 <=  (others=>'0');
+        pcplus4_out <=  (others=>'0');
+        pc_out <=  (others=>'0');
+    elsif (rising_edge(clk) and Stall/='1') then  
         -- To stall literally all I did was add the condition
         -- The PCSrc condition is for flushing in case of branch and jump instructions
         if (PCSrc='1') then 

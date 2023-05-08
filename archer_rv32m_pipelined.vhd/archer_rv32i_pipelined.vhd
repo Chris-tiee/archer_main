@@ -101,6 +101,7 @@ architecture rtl of archer_rv32i_pipelined is
             MStall : in std_logic_vector(1 downto 0); -- stalling to simulate 5cc 
             MNop : in std_logic;
             dfStall : in std_logic;
+            bStall : in std_logic;
             Jump : out std_logic;
             Lui : out std_logic;
             PCSrc : out std_logic;
@@ -114,7 +115,10 @@ architecture rtl of archer_rv32i_pipelined is
             CSRWen : out std_logic; -- write enable checks if rs1=x0
             CSR : out std_logic; -- is it a CSR
             Stall : out std_logic;
+            regularStall : out std_logic;
+            branchStall : out std_logic;
             Nop : out std_logic;
+            bNop : out std_logic;
             MExt : out std_logic -- if from M extension
         ) ;
     end component; 
@@ -197,7 +201,10 @@ architecture rtl of archer_rv32i_pipelined is
             rs1 : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
             rs2 : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
             rd_EX : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
-            instruction: in std_logic_vector (XLEN-1 downto 0);
+            rs1_ID : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            rs2_ID : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
+            instruction_ID : in std_logic_vector(XLEN-1 downto 0);
+            instruction : in std_logic_vector (XLEN-1 downto 0);
             instruction_mult : in std_logic_vector (XLEN-1 downto 0);
             MExt : in std_logic;
             rd_mult_EX : in std_logic_vector (LOG2_XRF_SIZE-1 downto 0);
@@ -211,6 +218,9 @@ architecture rtl of archer_rv32i_pipelined is
             regB : out std_logic_vector (1 downto 0);
             regA_mult : out  std_logic_vector (1 downto 0);
             regB_mult : out std_logic_vector (1 downto 0);
+            regA_branch : out  std_logic_vector (1 downto 0);
+            regB_branch : out std_logic_vector (1 downto 0);
+            bStall : out std_logic;
             stall : out std_logic
         );
     end component;
@@ -255,6 +265,8 @@ architecture rtl of archer_rv32i_pipelined is
             pcplus4_out : out std_logic_vector (XLEN-1 downto 0);
             pc_in : in std_logic_vector (XLEN-1 downto 0);
             pc_out : out std_logic_vector (XLEN-1 downto 0);
+            
+            bNop : in std_logic;
             Stall : in std_logic;
 
             Jump_in : in std_logic;
@@ -369,6 +381,8 @@ architecture rtl of archer_rv32i_pipelined is
     signal d_rs2_ID : std_logic_vector (4 downto 0);
     signal d_regA_ID : std_logic_vector (XLEN-1 downto 0);
     signal d_regB_ID : std_logic_vector (XLEN-1 downto 0);
+    signal d_regA_b_ID : std_logic_vector (XLEN-1 downto 0);
+    signal d_regB_b_ID : std_logic_vector (XLEN-1 downto 0);
     signal d_immediate_ID : std_logic_vector (XLEN-1 downto 0);
 
     signal d_pcplus4_ID : std_logic_vector(XLEN-1 downto 0);
@@ -389,7 +403,10 @@ architecture rtl of archer_rv32i_pipelined is
     signal c_csr_ID : std_logic;
 
     signal c_stall_ID : std_logic;
+    signal c_stall_regular_ID : std_logic;
+    signal c_stall_branch_ID : std_logic;
     signal c_nop_ID : std_logic;
+    signal c_bnop_ID : std_logic;
     signal c_mext_ID : std_logic;
 
     --EX stage
@@ -425,10 +442,13 @@ architecture rtl of archer_rv32i_pipelined is
     signal c_regB_EX : std_logic_vector (1 downto 0);
     signal c_regA_mult_EX : std_logic_vector (1 downto 0);
     signal c_regB_mult_EX : std_logic_vector (1 downto 0);
+    signal c_regA_branch_EX : std_logic_vector (1 downto 0);
+    signal c_regB_branch_EX : std_logic_vector (1 downto 0);
 
     signal c_mstall_EX : std_logic_vector(1 downto 0);
     signal c_mnop_EX : std_logic;
     signal c_stall_df_EX : std_logic;
+    signal c_stall_b_EX : std_logic;
 
     signal c_jump_EX : std_logic;
     signal c_lui_EX : std_logic;
@@ -499,12 +519,17 @@ begin
                                 pc_in => d_pc_out_IF, pc_out => d_pc_out_ID, PCSrc => c_PCSrc_ID, Stall => c_stall_ID );
 
     control_inst : control port map (instruction => d_instr_word_ID, BranchCond => c_branch_out, MStall => c_mstall_EX, MNop => c_mnop_EX,
-                                    dfStall=> c_stall_df_EX, Jump => c_jump_ID, Lui => c_lui_ID, PCSrc => c_PCSrc_ID, RegWrite => c_reg_write_ID,
-                                    ALUSrc1 => c_alu_src1_ID, ALUSrc2 => c_alu_src2_ID, ALUOp => c_alu_op_ID, MemWrite => c_mem_write_ID,
-                                    MemRead => c_mem_read_ID, MemToReg => c_mem_to_reg_ID, CSRWen => c_csrwen_ID, CSR => c_csr_ID, 
-                                    Stall => c_stall_ID, Nop => c_nop_ID, MExt => c_mext_ID );
+                                    dfStall=> c_stall_df_EX, bStall => c_stall_b_EX, Jump => c_jump_ID, Lui => c_lui_ID, PCSrc => c_PCSrc_ID,
+                                    RegWrite => c_reg_write_ID, ALUSrc1 => c_alu_src1_ID, ALUSrc2 => c_alu_src2_ID, ALUOp => c_alu_op_ID, 
+                                    MemWrite => c_mem_write_ID, MemRead => c_mem_read_ID, MemToReg => c_mem_to_reg_ID, CSRWen => c_csrwen_ID, 
+                                    CSR => c_csr_ID, Stall => c_stall_ID, regularStall => c_stall_regular_ID, branchStall => c_stall_branch_ID,
+                                    Nop => c_nop_ID, MExt => c_mext_ID );
     
-    brcmp_inst : branch_cmp port map (inputA => d_regA_ID, inputB => d_regB_ID, cond => d_funct3, result => c_branch_out);
+    regA_b_mux : mux3to1 port map (sel => c_regA_branch_EX, input00 => d_regA_ID, input01 => d_alu_result_MEM, input10 => d_reg_file_datain_WB, output => d_regA_b_ID);
+    regB_b_mux : mux3to1 port map (sel => c_regB_branch_EX, input00 => d_regB_ID, input01 => d_alu_result_MEM, input10 => d_reg_file_datain_WB, output => d_regB_b_ID);
+    
+
+    brcmp_inst : branch_cmp port map (inputA => d_regA_b_ID, inputB => d_regB_b_ID, cond => d_funct3, result => c_branch_out);
 
     immgen_inst : immgen port map (instruction => d_instr_word_ID, immediate => d_immediate_ID);
 
@@ -517,8 +542,8 @@ begin
                                 rs1_in => d_rs1_ID, rs1_out => d_rs1_EX, rs2_in => d_rs2_ID, rs2_out => d_rs2_EX,
                                 regA_in => d_regA_ID, regB_in => d_regB_ID, regA_out => d_regA_rf_EX, regB_out => d_regB_rf_EX, immediate_in => d_immediate_ID, 
                                 immediate_out => d_immediate_EX, pcplus4_in => d_pcplus4_ID, pcplus4_out => d_pcplus4_EX, pc_in => d_pc_out_ID, 
-                                pc_out => d_pc_out_EX, Stall => c_stall_ID, Jump_in => c_jump_ID, Jump_out => c_jump_EX, Lui_in => c_lui_ID, Lui_out => c_lui_EX,
-                                RegWrite_in => c_reg_write_ID, RegWrite_out => c_reg_write_EX, ALUSrc1_in => c_alu_src1_ID, ALUSrc1_out => c_alu_src1_EX,
+                                pc_out => d_pc_out_EX, bNop => c_bnop_ID, Stall => c_stall_regular_ID, Jump_in => c_jump_ID, Jump_out => c_jump_EX, Lui_in => c_lui_ID, 
+                                Lui_out => c_lui_EX, RegWrite_in => c_reg_write_ID, RegWrite_out => c_reg_write_EX, ALUSrc1_in => c_alu_src1_ID, ALUSrc1_out => c_alu_src1_EX,
                                 ALUSrc2_in => c_alu_src2_ID, ALUSrc2_out => c_alu_src2_EX, ALUOp_in => c_alu_op_ID, ALUOp_out => c_alu_op_EX,
                                 MemWrite_in => c_mem_write_ID, MemWrite_out => c_mem_write_EX, MemRead_in => c_mem_read_ID, MemRead_out => c_mem_read_EX,
                                 MemToReg_in => c_mem_to_reg_ID,MemToReg_out => c_mem_to_reg_EX, CSRWen_in => c_csrwen_ID, CSRWen_out => c_csrwen_EX,
@@ -542,10 +567,11 @@ begin
     instr_mux : mux2to1 port map (sel => c_mext_EX, input0 => d_instr_word_EX, input1 => d_instr_word_mult_EX, output => d_instr_word_final_EX);
     rd_mux : mux2to1_5b port map (sel => c_mext_EX, input0 => d_rd_EX, input1 => d_rd_mult_EX, output => d_rd_final_EX);
 
-    dataForwarding_inst : dataForwarding port map (clk => clk, rs1=> d_rs1_EX, rs2=>d_rs2_EX, rd_EX => d_rd_EX, instruction => d_instr_word_EX, instruction_mult => d_instr_word_mult_EX, 
-                                                    MExt => c_mext_EX, rd_mult_EX => d_rd_mult_EX, rd_MEM => d_rd_MEM, MemToReg_MEM => c_mem_to_reg_MEM, Jump_MEM => c_jump_MEM,
-                                                    RegWrite_MEM => c_reg_write_MEM, rd_WB => d_rd_WB, RegWrite_WB => c_reg_write_WB, regA => c_regA_EX, regB => c_regB_EX, 
-                                                    regA_mult => c_regA_mult_EX, regB_mult =>c_regB_mult_EX, stall => c_stall_df_EX);
+    dataForwarding_inst : dataForwarding port map (clk => clk, rs1=> d_rs1_EX, rs2=>d_rs2_EX, rd_EX => d_rd_EX, rs1_ID => d_rs1_ID, rs2_ID =>d_rs2_ID, instruction_ID => d_instr_word_ID,
+                                                    instruction => d_instr_word_EX, instruction_mult => d_instr_word_mult_EX, MExt => c_mext_EX, rd_mult_EX => d_rd_mult_EX, rd_MEM => d_rd_MEM,
+                                                    MemToReg_MEM => c_mem_to_reg_MEM, Jump_MEM => c_jump_MEM, RegWrite_MEM => c_reg_write_MEM, rd_WB => d_rd_WB, RegWrite_WB => c_reg_write_WB, 
+                                                    regA => c_regA_EX, regB => c_regB_EX, regA_mult => c_regA_mult_EX, regB_mult =>c_regB_mult_EX, regA_branch => c_regA_branch_EX, regB_branch => c_regB_branch_EX,
+                                                    bStall => c_stall_b_EX, stall => c_stall_df_EX);
     
     EX_MEM_reg : ex_mem port map (clk => clk, rst_n => rst_n, instruction_in => d_instr_word_final_EX, instruction_out => d_instr_word_MEM, byte_mask => d_byte_mask,
                                     sign_ext_n => d_sign_ext_n, pcplus4_in => d_pcplus4_EX, pcplus4_out => d_pcplus4_MEM, Nop => c_nop_ID, rd_in => d_rd_final_EX,
