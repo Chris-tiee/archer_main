@@ -37,7 +37,19 @@ architecture rtl of mem_wb is
 begin
     process(clk, rst_n)
     begin
-    if rising_edge(clk) then  
+    if rst_n='0' then 
+        instruction_out <= (others=>'0'); 
+        pcplus4_out <= (others=>'0');
+        rd_out <= (others=>'0');
+
+        alu_out <= (others=>'0');
+        mem_out <= (others=>'0');
+        
+        Jump_out <= '0';
+        RegWrite_out <= '0';
+        MemToReg_out <= '0';
+        CSRWen_out <= '0';
+    elsif rising_edge(clk) then  
 
         instruction_out <= instruction_in;   
         pcplus4_out <= pcplus4_in;

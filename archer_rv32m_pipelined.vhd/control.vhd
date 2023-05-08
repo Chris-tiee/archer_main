@@ -25,6 +25,7 @@ entity control is
     MStall : in std_logic_vector(1 downto 0); -- stalling to simulate 5cc 
     MNop : in std_logic;
     dfStall : in std_logic;
+    bStall : in std_logic;
     Jump : out std_logic;
     Lui : out std_logic;
     PCSrc : out std_logic;
@@ -38,7 +39,10 @@ entity control is
     CSRWen : out std_logic; -- write enable checks if rs1=x0
     CSR : out std_logic; -- is it a CSR
     Stall : out std_logic;
+    regularStall : out std_logic;
+    branchStall : out std_logic;
     Nop : out std_logic;
+    bNop : out std_logic;
     MExt : out std_logic -- if from M extension 
 
   ) ;
@@ -65,7 +69,7 @@ begin
 
   Jump <= jump_instr;
 
-  process (opcode, funct3, funct7, MStall, MNop, dfStall) is
+  process (opcode, funct3, funct7, MStall, MNop, dfStall, bStall) is
   begin
 
     Lui <= '0';
@@ -79,7 +83,10 @@ begin
     CSRWen <= '0';
     CSR <= '0';
     Stall <= '0';
+    regularStall <= '0';
+    branchStall <= '0';
     Nop <= '0';
+    bNop <= '0';
     MExt <= '0';
 
     case opcode is
@@ -159,14 +166,24 @@ begin
 
     if (MStall="10" and (opcode/= OPCODE_RTYPE or funct7(0)/='1' or funct3(2)/='0'))  then 
       Stall<='1';
+      regularStall <= '1';
     elsif (MStall ="11") then
       Stall <='1';
+      regularStall <= '1';
     elsif (dfStall='1') then
       Stall<='1';
+      regularStall <= '1';
     end if;
+
 
     if (MNop='1' or dfStall='1') then
       Nop <='1';
+    end if;
+
+    if (bStall='1') then
+      bNop <= '1';
+      branchStall <= '1';
+      Stall <='1';
     end if;
 
   end process;

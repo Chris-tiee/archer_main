@@ -44,8 +44,7 @@ architecture rtl of ex_mem is
 begin
     process(clk, rst_n)
     begin
-    if rising_edge(clk) then 
-        if (Nop='1' or rst_n='0') then 
+        if ((Nop='1' and rising_edge(clk)) or rst_n='0') then 
             instruction_out <= (others=>'0');
             byte_mask <= (others=>'0');
             sign_ext_n <= '0';
@@ -60,7 +59,7 @@ begin
             MemRead_out <= '0';
             MemToReg_out <= '0';
             CSRWen_out <= '0';
-        else
+        elsif rising_edge(clk) then
             instruction_out <= instruction_in;
             byte_mask <= instruction_in(13 downto 12);
             sign_ext_n <= instruction_in(14);
@@ -76,7 +75,5 @@ begin
             MemToReg_out <= MemToReg_in;
             CSRWen_out <= CSRWen_in;
         end if;
-
-    end if;
     end process;
 end architecture;
