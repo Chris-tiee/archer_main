@@ -58,7 +58,7 @@ begin
         regA_branch <= "00";
         regB_branch <= "00";
 
-        if rd_EX/="00000" then
+        if (rd_EX/="00000" or opcode=OPCODE_STORE) then
 
             -- normal dataForwarding
             if opcode/=OPCODE_LUI and opcode/=OPCODE_AUIPC and opcode/=OPCODE_JAL then

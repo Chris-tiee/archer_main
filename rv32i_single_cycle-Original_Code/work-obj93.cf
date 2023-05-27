@@ -1,0 +1,42 @@
+v 4
+file . "archer_rv32i_single_cycle_tb.vhd" "73db5229209e66492752b9dcc59f23ecccbbc11d" "20230527113305.020":
+  entity archer_rv32i_single_cycle_tb at 16( 541) + 0 on 36;
+  architecture arch of archer_rv32i_single_cycle_tb at 24( 715) + 0 on 37;
+file . "archer_rv32i_single_cycle.vhd" "b845168c3b25eb574e508b09c40cd8764f78cdcd" "20230527113305.017":
+  entity archer_rv32i_single_cycle at 16( 576) + 0 on 34;
+  architecture rtl of archer_rv32i_single_cycle at 40( 1549) + 0 on 35;
+file . "archer_pkg.vhd" "7693d43b088b50f8f30a4c0224d655ce097d566e" "20230527113239.021":
+  package archer_pkg at 16( 544) + 0 on 11;
+file . "add4.vhd" "f01fe653e2474fbcec0cb767067ae24c2e44b647" "20230527113248.651":
+  entity add4 at 16( 538) + 0 on 12;
+  architecture rtl of add4 at 28( 801) + 0 on 13;
+file . "alu.vhd" "3574c2c955563b3e28396109ed751c24b2cfcb19" "20230527113248.652":
+  entity alu at 16( 546) + 0 on 14;
+  architecture rtl of alu at 30( 901) + 0 on 15;
+file . "branch_cmp.vhd" "9cef6ba55c7c3156f6aee2c0c8bd984e4fee34f8" "20230527113248.654":
+  entity branch_cmp at 16( 532) + 0 on 16;
+  architecture rtl of branch_cmp at 30( 872) + 0 on 17;
+file . "control.vhd" "1ec31c333b7a0f33411232cd69f5767e02a7fed4" "20230527113248.655":
+  entity control at 16( 547) + 0 on 18;
+  architecture arch of control at 38( 1151) + 0 on 19;
+file . "immgen.vhd" "b4189d9d8a5c0219c46e73625e5c1f758dd5e7cf" "20230527113248.657":
+  entity immgen at 16( 534) + 0 on 20;
+  architecture rtl of immgen at 28( 797) + 0 on 21;
+file . "lmb.vhd" "3b4d1bc9fc7f02fde4069abcb4c369f317f9f600" "20230527113248.658":
+  entity lmb at 17( 560) + 0 on 22;
+  architecture rtl of lmb at 39( 1447) + 0 on 23;
+file . "mux2to1.vhd" "b7102c457003d127be892ae09bbb28f6d747327d" "20230527113248.660":
+  entity mux2to1 at 16( 542) + 0 on 24;
+  architecture rtl of mux2to1 at 30( 883) + 0 on 25;
+file . "pc.vhd" "5d7a07a8b477603d267b91457f98b7f5ab285592" "20230527113248.661":
+  entity pc at 16( 559) + 0 on 26;
+  architecture rtl of pc at 30( 877) + 0 on 27;
+file . "regfile.vhd" "5ba243fee6ea44c3219b45a10c83af380d21f4b0" "20230527113248.663":
+  entity regfile at 16( 573) + 0 on 28;
+  architecture rtl of regfile at 35( 1178) + 0 on 29;
+file . "rom.vhd" "23bfd8a55573f0e1b30435e8ef5d2513ee5109a6" "20230527113248.664":
+  entity rom at 16( 574) + 0 on 30;
+  architecture rtl of rom at 28( 837) + 0 on 31;
+file . "sram.vhd" "c94a501ad94ba212f0c2e8bb0ee8b56cfe2c787f" "20230527113248.666":
+  entity sram at 17( 559) + 0 on 32;
+  architecture rtl of sram at 33( 988) + 0 on 33;
